@@ -61,4 +61,37 @@ public class TransactionPageTest {
         assertEquals(expect2, actual2, "Баланс первой карты после перевода не совпадает!");
         assertEquals(expect1, actual1, "Баланс второй карты после перевода не совпадает!");
     }
+
+    @Test
+    @DisplayName("Проверка отображения ошибки при отправке пустой формы")
+    void shouldTransferEmptyForm() {
+        TransactionPage transactionPage = dashboard.transferMoney(1);
+        transactionPage.clickButtonAdd();
+        transactionPage.checkMessageError();
+    }
+
+    @Test
+    @DisplayName("Проверка перевода суммы большей, чем балланс карты")
+    void shouldTransferOverdraft() {
+        TransactionPage transactionPage = dashboard.transferMoney(1);
+        int overdraftAmount = 10_001;
+        transactionPage.transaction(Integer.toString(overdraftAmount), cardNumber(0));
+        transactionPage.checkMessageError();
+    }
+
+    @Test
+    @DisplayName("Проверка перевода нуля рублей")
+    void shouldTransferZeroSum() {
+        TransactionPage transactionPage = dashboard.transferMoney(1);
+        transactionPage.transaction(Integer.toString(0), cardNumber(0));
+        transactionPage.checkMessageError();
+    }
+
+    @Test
+    @DisplayName("Проверка отображения ошибки при отправке пустого значения в поле ")
+    void shouldTransferEmptySum() {
+        TransactionPage transactionPage = dashboard.transferMoney(1);
+        transactionPage.transaction("", cardNumber(0));
+        transactionPage.checkMessageError();
+    }
 }

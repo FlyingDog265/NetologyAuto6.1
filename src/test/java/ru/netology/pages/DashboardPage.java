@@ -4,17 +4,19 @@ import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 
 import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.element;
 import static com.codeborne.selenide.Selenide.elements;
 import static ru.netology.helpers.CardHelper.cardNumber;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class DashboardPage {
-    private final SelenideElement heading = element("h2[data-test-id='dashboard']");
+    private final SelenideElement header = element(byText("Ваши карты"));
     private final ElementsCollection cards = elements("li[class='list__item']");
     private final ElementsCollection buttons = elements("button[data-test-id='action-deposit']");
 
     public DashboardPage() {
-        heading.shouldBe(visible);
+        header.shouldBe(visible);
     }
 
     public int getCardBalance(int cardNumber) {
@@ -38,14 +40,17 @@ public class DashboardPage {
     }
 
     public void equalizeBalance() {
-        int firstBalance = getCardBalance(0);
-        int secondBalance = getCardBalance(1);
-        if (firstBalance > secondBalance) {
-            int amount = firstBalance - 10_000;
-            transferMoney(1).transaction(Integer.toString(amount), cardNumber(0));
-        } else if (secondBalance > firstBalance) {
-            int amount = secondBalance - 10_000;
-            transferMoney(0).transaction(Integer.toString(amount), cardNumber(1));
+        if (header.isDisplayed()) {
+            int firstBalance = getCardBalance(0);
+            int secondBalance = getCardBalance(1);
+
+            if (firstBalance > secondBalance) {
+                int amount = firstBalance - 10_000;
+                transferMoney(1).transaction(Integer.toString(amount), cardNumber(0));
+            } else if (secondBalance > firstBalance) {
+                int amount = secondBalance - 10_000;
+                transferMoney(0).transaction(Integer.toString(amount), cardNumber(1));
+            }
         }
     }
 }
